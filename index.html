@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sentio — Acceso anticipado</title>
+  <meta name="description" content="Sentio te ayuda a entender tus emociones y construir resiliencia. Reserva tu lugar.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg: #0F0F0F;
+      --surface: #1A1A1A;
+      --primary: #0404FB;
+      --primary-light: #3030FF;
+      --accent: #00FFBD;
+      --text: #F0F0F0;
+      --text-secondary: #808080;
+      --text-tertiary: #606060;
+      --border: rgba(255,255,255,0.1);
+      --divider: #2A2A2A;
+    }
+
+    body {
+      font-family: 'Manrope', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    canvas { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+
+    /* Orbs */
+    .orb {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(140px);
+      pointer-events: none;
+      z-index: 0;
+    }
+    .orb-1 {
+      width: 400px; height: 400px;
+      background: var(--primary);
+      opacity: 0.12;
+      top: -120px; left: -80px;
+      animation: drift1 14s ease-in-out infinite;
+    }
+    .orb-2 {
+      width: 350px; height: 350px;
+      background: var(--accent);
+      opacity: 0.08;
+      bottom: -100px; right: -60px;
+      animation: drift2 18s ease-in-out infinite;
+    }
+    @keyframes drift1 {
+      0%,100% { transform: translate(0,0); }
+      50% { transform: translate(60px,40px); }
+    }
+    @keyframes drift2 {
+      0%,100% { transform: translate(0,0); }
+      50% { transform: translate(-50px,-30px); }
+    }
+
+    /* Layout */
+    .page {
+      position: relative;
+      z-index: 1;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 48px 24px;
+    }
+
+    /* Logo */
+    .logo {
+      width: 56px;
+      height: 56px;
+      border-radius: 16px;
+      object-fit: contain;
+      animation: fadeIn 0.6s ease;
+      margin-bottom: 40px;
+      filter: drop-shadow(0 0 30px rgba(4,4,251,0.3));
+    }
+
+    /* Badge */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 14px 5px 7px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 100px;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.8px;
+      color: var(--accent);
+      text-transform: uppercase;
+      animation: fadeIn 0.8s ease 0.1s both;
+    }
+    .badge .dot {
+      width: 6px; height: 6px;
+      background: var(--accent);
+      border-radius: 50%;
+      animation: blink 2s ease-in-out infinite;
+    }
+    @keyframes blink {
+      0%,100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+
+    /* Text */
+    h1 {
+      margin-top: 28px;
+      font-size: clamp(28px, 6vw, 48px);
+      font-weight: 800;
+      line-height: 1.1;
+      text-align: center;
+      letter-spacing: -1.5px;
+      animation: fadeUp 0.8s ease 0.2s both;
+    }
+    h1 em {
+      font-style: normal;
+      background: linear-gradient(135deg, var(--primary-light), var(--accent));
+      background-size: 200% 200%;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: shimmer 6s ease-in-out infinite;
+    }
+    @keyframes shimmer {
+      0%,100% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+    }
+
+    .sub {
+      margin-top: 14px;
+      font-size: 14px;
+      color: var(--text-secondary);
+      text-align: center;
+      max-width: 380px;
+      line-height: 1.6;
+      font-weight: 400;
+      animation: fadeUp 0.8s ease 0.35s both;
+    }
+
+    /* Form */
+    .form-area {
+      margin-top: 36px;
+      width: 100%;
+      max-width: 400px;
+      animation: fadeUp 0.8s ease 0.5s both;
+    }
+    .field {
+      display: flex;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+      transition: border-color 0.3s, box-shadow 0.3s;
+    }
+    .field:focus-within {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(4,4,251,0.15);
+    }
+    .field input {
+      flex: 1;
+      background: none;
+      border: none;
+      outline: none;
+      padding: 14px 16px;
+      font-family: inherit;
+      font-size: 13px;
+      color: var(--text);
+      font-weight: 500;
+    }
+    .field input::placeholder { color: var(--text-tertiary); }
+    .field button {
+      padding: 10px 22px;
+      margin: 5px;
+      background: var(--primary);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      font-family: inherit;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: transform 0.15s, box-shadow 0.15s, opacity 0.2s;
+      letter-spacing: 0.2px;
+    }
+    .field button:hover {
+      transform: scale(1.04);
+      box-shadow: 0 4px 16px rgba(4,4,251,0.35);
+    }
+    .field button:active { transform: scale(0.96); }
+    .field button:disabled { opacity: 0.4; cursor: default; transform: none; }
+
+    /* Counter */
+    .meta {
+      margin-top: 16px;
+      text-align: center;
+      font-size: 11px;
+      color: var(--text-tertiary);
+      animation: fadeUp 0.8s ease 0.65s both;
+    }
+    .meta strong { color: var(--accent); font-weight: 700; }
+    .bar {
+      margin-top: 8px;
+      height: 2px;
+      background: var(--divider);
+      border-radius: 100px;
+      max-width: 160px;
+      margin-inline: auto;
+      overflow: hidden;
+    }
+    .bar div {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--primary), var(--accent));
+      border-radius: 100px;
+      animation: grow 1.8s ease 1.2s forwards;
+    }
+    @keyframes grow { to { width: 73%; } }
+
+    /* Success */
+    .ok { display: none; flex-direction: column; align-items: center; gap: 14px; }
+    .ok.show { display: flex; animation: pop 0.5s cubic-bezier(0.34,1.56,0.64,1); }
+    .ok-icon {
+      width: 56px; height: 56px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      display: flex; align-items: center; justify-content: center;
+      font-size: 24px;
+      box-shadow: 0 0 40px rgba(4,4,251,0.3);
+    }
+    .ok-title {
+      font-size: 18px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+    }
+    .ok-text {
+      font-size: 13px;
+      color: var(--text-secondary);
+      text-align: center;
+      max-width: 320px;
+      line-height: 1.5;
+    }
+    @keyframes pop {
+      0% { opacity: 0; transform: scale(0.85); }
+      100% { opacity: 1; transform: scale(1); }
+    }
+
+    /* Confetti */
+    .confetti { position: fixed; pointer-events: none; z-index: 100; }
+    .cp {
+      position: absolute;
+      width: 6px; height: 6px;
+      border-radius: 1px;
+      animation: fall 2.5s ease-in forwards;
+    }
+    @keyframes fall {
+      0% { opacity: 1; transform: translateY(0) rotate(0deg); }
+      100% { opacity: 0; transform: translateY(100vh) rotate(600deg); }
+    }
+
+    /* Footer */
+    .foot {
+      position: relative; z-index: 1;
+      padding: 20px;
+      text-align: center;
+      font-size: 11px;
+      color: var(--text-tertiary);
+      opacity: 0.4;
+    }
+
+    /* Animations */
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes shake {
+      0%,100% { transform: translateX(0); }
+      20% { transform: translateX(-6px); }
+      40% { transform: translateX(6px); }
+      60% { transform: translateX(-4px); }
+      80% { transform: translateX(4px); }
+    }
+
+    @media (max-width: 480px) {
+      .field { flex-direction: column; }
+      .field button { margin: 0 5px 5px; padding: 14px; border-radius: 9px; }
+    }
+  </style>
+</head>
+<body>
+
+  <canvas id="c"></canvas>
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+
+  <div class="page">
+    <img src="logo.png" alt="Sentio" class="logo">
+
+    <div class="badge"><span class="dot"></span>Acceso anticipado</div>
+
+    <h1>Sentir no es<br><em>debilidad.</em></h1>
+
+    <p class="sub">Entendé lo que sentís. Construí resiliencia emocional. Sin filtros, sin juicios.</p>
+
+    <div class="form-area" id="fa">
+      <div class="field" id="field">
+        <input type="email" id="email" placeholder="tu@email.com" autocomplete="email">
+        <button id="btn" onclick="send()">Reservar lugar</button>
+      </div>
+    </div>
+
+    <div class="ok" id="ok">
+      <div class="ok-icon">&#10003;</div>
+      <div class="ok-title">Estás dentro.</div>
+      <div class="ok-text">Te avisaremos cuando sea tu turno. Preparate para algo distinto.</div>
+    </div>
+
+    <div class="meta" id="meta">
+      <span><strong id="cn">0</strong> personas esperando</span>
+      <div class="bar"><div></div></div>
+    </div>
+  </div>
+
+  <div class="foot">Sentio &mdash; by B2Better</div>
+
+  <script>
+    const SUPABASE_URL = 'https://guwltpbbvgedopeqcuvz.supabase.co';
+    const SUPABASE_KEY = 'sb_publishable_CQPGU6ycM6qzzC8D766fdw_UIEAon-P';
+
+    // ── Particles ──
+    const cv = document.getElementById('c');
+    const cx = cv.getContext('2d');
+    let pts = [], mx = {x:null, y:null};
+
+    function resize() { cv.width = innerWidth; cv.height = innerHeight; }
+    resize(); addEventListener('resize', resize);
+    document.addEventListener('mousemove', e => { mx.x = e.clientX; mx.y = e.clientY; });
+
+    class P {
+      constructor() { this.r(); }
+      r() {
+        this.x = Math.random()*cv.width;
+        this.y = Math.random()*cv.height;
+        this.s = Math.random()*1.5+0.3;
+        this.dx = (Math.random()-0.5)*0.2;
+        this.dy = (Math.random()-0.5)*0.2;
+        this.o = Math.random()*0.4+0.05;
+        this.c = Math.random()>0.5 ? '4,4,251' : '0,255,189';
+      }
+      u() {
+        this.x += this.dx; this.y += this.dy;
+        if (mx.x !== null) {
+          const d = Math.hypot(mx.x-this.x, mx.y-this.y);
+          if (d < 120) { this.x += (mx.x-this.x)*0.002; this.y += (mx.y-this.y)*0.002; }
+        }
+        if (this.x<0||this.x>cv.width||this.y<0||this.y>cv.height) this.r();
+      }
+      d() {
+        cx.beginPath();
+        cx.arc(this.x, this.y, this.s, 0, Math.PI*2);
+        cx.fillStyle = `rgba(${this.c},${this.o})`;
+        cx.fill();
+      }
+    }
+
+    for (let i=0;i<50;i++) pts.push(new P());
+
+    function loop() {
+      cx.clearRect(0,0,cv.width,cv.height);
+      pts.forEach(p => { p.u(); p.d(); });
+      // Lines
+      for (let i=0;i<pts.length;i++)
+        for (let j=i+1;j<pts.length;j++) {
+          const d = Math.hypot(pts[i].x-pts[j].x, pts[i].y-pts[j].y);
+          if (d<100) {
+            cx.beginPath();
+            cx.strokeStyle = `rgba(4,4,251,${0.04*(1-d/100)})`;
+            cx.lineWidth = 0.4;
+            cx.moveTo(pts[i].x, pts[i].y);
+            cx.lineTo(pts[j].x, pts[j].y);
+            cx.stroke();
+          }
+        }
+      requestAnimationFrame(loop);
+    }
+    loop();
+
+    // ── Counter ──
+    async function loadCount() {
+      try {
+        const r = await fetch(`${SUPABASE_URL}/rest/v1/whitelist?select=id`, {
+          headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
+        });
+        if (r.ok) {
+          const data = await r.json();
+          animateCount(data.length);
+        } else {
+          animateCount(0);
+        }
+      } catch(e) {
+        animateCount(0);
+      }
+    }
+
+    function animateCount(target) {
+      const el = document.getElementById('cn');
+      let cur = 0;
+      const step = Math.max(1, Math.ceil(target/40));
+      function tick() {
+        if (cur < target) {
+          cur = Math.min(cur+step, target);
+          el.textContent = cur;
+          requestAnimationFrame(tick);
+        }
+      }
+      setTimeout(tick, 1000);
+    }
+    loadCount();
+
+    // ── Submit ──
+    async function send() {
+      const input = document.getElementById('email');
+      const btn = document.getElementById('btn');
+      const val = input.value.trim();
+
+      if (!val || !val.includes('@') || !val.includes('.')) {
+        const f = document.getElementById('field');
+        f.style.animation = 'none'; f.offsetHeight;
+        f.style.animation = 'shake 0.35s ease';
+        return;
+      }
+
+      btn.disabled = true;
+      btn.textContent = 'Enviando...';
+
+      try {
+        const r = await fetch(`${SUPABASE_URL}/rest/v1/whitelist`, {
+          method: 'POST',
+          headers: {
+            'apikey': SUPABASE_KEY,
+            'Authorization': `Bearer ${SUPABASE_KEY}`,
+            'Content-Type': 'application/json',
+            'Prefer': 'return=minimal',
+          },
+          body: JSON.stringify({ email: val }),
+        });
+
+        if (r.ok || r.status === 201) {
+          showSuccess();
+        } else {
+          const err = await r.json();
+          if (err.code === '23505') {
+            // Duplicate email
+            showSuccess();
+          } else {
+            btn.textContent = 'Error, reintentá';
+            btn.disabled = false;
+          }
+        }
+      } catch(e) {
+        btn.textContent = 'Error, reintentá';
+        btn.disabled = false;
+      }
+    }
+
+    function showSuccess() {
+      document.getElementById('fa').style.display = 'none';
+      document.getElementById('meta').style.display = 'none';
+      document.getElementById('ok').classList.add('show');
+      confetti();
+      if (navigator.vibrate) navigator.vibrate([50,30,100]);
+    }
+
+    document.getElementById('email').addEventListener('keypress', e => {
+      if (e.key === 'Enter') send();
+    });
+
+    // ── Confetti ──
+    function confetti() {
+      const c = document.createElement('div');
+      c.className = 'confetti';
+      document.body.appendChild(c);
+      const cols = ['#0404FB','#00FFBD','#3030FF','#fff','#C9A96E'];
+      for (let i=0;i<40;i++) {
+        const p = document.createElement('div');
+        p.className = 'cp';
+        p.style.left = Math.random()*100+'vw';
+        p.style.top = '-8px';
+        p.style.background = cols[~~(Math.random()*cols.length)];
+        p.style.animationDelay = Math.random()*0.6+'s';
+        p.style.animationDuration = (Math.random()*1.5+1.5)+'s';
+        c.appendChild(p);
+      }
+      setTimeout(() => c.remove(), 3500);
+    }
+  </script>
+</body>
+</html>
