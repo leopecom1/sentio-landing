@@ -252,7 +252,7 @@
     .hero .meta span { display: inline-flex; align-items: center; gap: 6px; }
     .hero .meta strong { color: var(--accent); font-weight: 700; }
 
-    /* ─── PHONE MOCKUP ─── */
+    /* ─── PHONE SHOWCASE (real screenshot) ─── */
     .showcase {
       margin-top: 80px;
       display: flex;
@@ -262,87 +262,35 @@
     .phone {
       position: relative;
       width: min(280px, 70vw);
-      aspect-ratio: 9/19;
-      background: linear-gradient(160deg, #1c1c20 0%, #0a0a0c 100%);
-      border-radius: 42px;
-      padding: 14px;
-      border: 1px solid rgba(255,255,255,0.12);
-      box-shadow:
-        0 0 0 1px rgba(255,255,255,0.04),
-        0 80px 160px -40px rgba(0,0,0,0.8),
-        0 30px 60px -10px rgba(48,48,255,0.25);
       will-change: transform;
       animation: float 6s ease-in-out infinite;
+      filter:
+        drop-shadow(0 80px 100px rgba(0,0,0,0.8))
+        drop-shadow(0 30px 60px rgba(48,48,255,0.35))
+        drop-shadow(0 0 80px rgba(0,255,189,0.12));
     }
     @keyframes float {
       0%,100% { transform: rotateX(8deg) rotateY(-6deg) translateY(0); }
-      50% { transform: rotateX(8deg) rotateY(-6deg) translateY(-12px); }
+      50% { transform: rotateX(8deg) rotateY(-6deg) translateY(-14px); }
     }
-    .phone-screen {
-      width: 100%; height: 100%;
-      border-radius: 30px;
-      background: linear-gradient(160deg, #0A0A0B 0%, #131318 50%, #0A0A0B 100%);
-      overflow: hidden;
-      position: relative;
-      display: flex;
-      flex-direction: column;
-      padding: 22px 18px;
+    .phone img {
+      width: 100%;
+      height: auto;
+      display: block;
+      border-radius: 38px;
+      border: 1px solid rgba(255,255,255,0.12);
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.04);
     }
-    .phone-screen::before {
+    /* Reflection/glare overlay to make it feel premium */
+    .phone::after {
       content: '';
       position: absolute;
-      top: 12px; left: 50%;
-      transform: translateX(-50%);
-      width: 100px; height: 24px;
-      background: #000;
-      border-radius: 100px;
-      z-index: 10;
+      inset: 0;
+      border-radius: 38px;
+      pointer-events: none;
+      background: linear-gradient(135deg, rgba(255,255,255,0.08) 0%, transparent 30%, transparent 70%, rgba(255,255,255,0.05) 100%);
+      mix-blend-mode: overlay;
     }
-    .ps-header { display: flex; align-items: center; justify-content: space-between; margin-top: 32px; }
-    .ps-greet { font-size: 11px; color: var(--text-tertiary); }
-    .ps-name { font-size: 16px; font-weight: 700; margin-top: 2px; }
-    .ps-avatar {
-      width: 32px; height: 32px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, var(--primary), var(--accent));
-    }
-    .ps-card {
-      margin-top: 16px;
-      background: rgba(255,255,255,0.04);
-      border: 1px solid var(--border);
-      border-radius: 18px;
-      padding: 14px;
-    }
-    .ps-card-label { font-size: 9px; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 0.6px; }
-    .ps-card-value { font-size: 22px; font-weight: 700; margin-top: 4px; background: linear-gradient(135deg, #fff, var(--accent)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .ps-emojis { display: flex; gap: 6px; margin-top: 14px; }
-    .ps-emojis div {
-      flex: 1;
-      height: 36px;
-      background: rgba(255,255,255,0.05);
-      border-radius: 12px;
-      border: 1px solid var(--border);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 14px;
-    }
-    .ps-emojis div.active {
-      background: linear-gradient(135deg, var(--primary), var(--primary-light));
-      border-color: transparent;
-      box-shadow: 0 4px 16px rgba(48,48,255,0.5);
-    }
-    .ps-quick { margin-top: 16px; display: grid; grid-template-columns: repeat(2,1fr); gap: 8px; }
-    .ps-quick div {
-      height: 50px;
-      background: rgba(255,255,255,0.04);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 8px 10px;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-    }
-    .ps-quick div span:first-child { font-size: 9px; color: var(--text-tertiary); text-transform: uppercase; }
-    .ps-quick div span:last-child { font-size: 11px; font-weight: 700; margin-top: 2px; }
 
     /* ─── PROBLEM ─── */
     .problem-grid {
@@ -850,38 +798,10 @@
         <span>· iOS &amp; Android</span>
       </div>
 
-      <!-- Phone mockup -->
+      <!-- Phone screenshot -->
       <div class="showcase" id="showcase">
         <div class="phone" id="phone">
-          <div class="phone-screen">
-            <div class="ps-header">
-              <div>
-                <div class="ps-greet">Buen día</div>
-                <div class="ps-name">Mateo</div>
-              </div>
-              <div class="ps-avatar"></div>
-            </div>
-            <div class="ps-card">
-              <div class="ps-card-label">Cómo te sentís hoy</div>
-              <div class="ps-emojis">
-                <div>😶</div>
-                <div>🙂</div>
-                <div class="active">😊</div>
-                <div>🔥</div>
-                <div>💭</div>
-              </div>
-            </div>
-            <div class="ps-card">
-              <div class="ps-card-label">Racha de check-ins</div>
-              <div class="ps-card-value">14 días</div>
-            </div>
-            <div class="ps-quick">
-              <div><span>Diario</span><span>Nueva entrada</span></div>
-              <div><span>IA</span><span>Conversar</span></div>
-              <div><span>Finanzas</span><span>+$ 84.500</span></div>
-              <div><span>Comunidad</span><span>3 nuevas</span></div>
-            </div>
-          </div>
+          <img src="/assets/captura1.png" alt="B2Better app" loading="eager">
         </div>
       </div>
     </div>
